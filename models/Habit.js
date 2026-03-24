@@ -11,6 +11,23 @@ const habitSchema = new mongoose.Schema({
     createdAt:{
         type: Date,
         default: Date.now
+    },
+    lastUpdated:{
+        type: Date,
+        default: Date.now
+    },
+    lastDone:{
+        type: Date,
+        default: null
+    },
+    days:{
+        type: Number,
+        default: 1
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 });
 
