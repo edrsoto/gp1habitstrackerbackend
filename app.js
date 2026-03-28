@@ -1,4 +1,16 @@
 require('./config/database');
+
+// Add database connection logging
+const mongoose = require('mongoose');
+mongoose.connection.on('connected', () => {
+  console.log('✅ MongoDB connected successfully');
+});
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error:', err);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('🔌 MongoDB disconnected');
+});
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -41,11 +53,26 @@ app.get('/api', (req, res) => {
 
 // Root route for health check
 app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Habits Tracker Backend API',
-    status: 'running',
-    timestamp: new Date().toISOString()
-  });
+  try {
+    console.log('🏥 Health check requested');
+    console.log('📊 DB connection state:', mongoose.connection.readyState);
+    
+    const response = { 
+      message: 'Habits Tracker Backend API',
+      status: 'running',
+      timestamp: new Date().toISOString(),
+      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    };
+    
+    console.log('✅ Sending response:', response);
+    res.json(response);
+  } catch (error) {
+    console.error('❌ Error in root route:', error);
+    res.status(500).json({ 
+      error: error.message,
+      status: 'error'
+    });
+  }
 });
 
 // catch 404 and forward to error handler
