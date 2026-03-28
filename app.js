@@ -24,7 +24,12 @@ var usersRouter = require('./routes/users');
 var app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    process.env.FRONTEND_URL,
+    'http://localhost:3000',
+    'https://gp1habitstrackerbackend.vercel.app',
+    'https://gp1habitstrackerbackend-htyl9geu5-ess-projects-ecec6cc8.vercel.app'
+  ].filter(Boolean),
   credentials: true
 }));
 
