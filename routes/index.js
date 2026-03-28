@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const Habit = require('../models/habit');
+const Habit = require('../models/Habit');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
