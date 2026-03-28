@@ -24,32 +24,7 @@ var usersRouter = require('./routes/users');
 var app = express();
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Allowed origins
-    const allowedOrigins = [
-      process.env.FRONTEND_URL,
-      'http://localhost:3000',
-      'https://localhost:3000',
-      'http://localhost:3001',
-      'https://gp1habitstrackerbackend.vercel.app',
-      'https://gp1habitstrackerbackend-htyl9geu5-ess-projects-ecec6cc8.vercel.app',
-      'https://gp1habitstracker-frontend-e8xdaq1sr-ess-projects-ecec6cc8.vercel.app'
-    ].filter(Boolean);
-    
-    if (process.env.NODE_ENV === 'development') {
-      // In development, allow all origins
-      return callback(null, true);
-    }
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+  origin: true, // Allow all origins
   credentials: true
 }));
 
