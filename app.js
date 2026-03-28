@@ -35,7 +35,8 @@ app.use(cors({
       'https://localhost:3000',
       'http://localhost:3001',
       'https://gp1habitstrackerbackend.vercel.app',
-      'https://gp1habitstrackerbackend-htyl9geu5-ess-projects-ecec6cc8.vercel.app'
+      'https://gp1habitstrackerbackend-htyl9geu5-ess-projects-ecec6cc8.vercel.app',
+      'https://gp1habitstracker-frontend-e8xdaq1sr-ess-projects-ecec6cc8.vercel.app'
     ].filter(Boolean);
     
     if (process.env.NODE_ENV === 'development') {
