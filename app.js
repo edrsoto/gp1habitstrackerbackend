@@ -25,6 +25,29 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+// API root route
+app.get('/api', (req, res) => {
+  res.json({ 
+    message: 'Habits Tracker API',
+    version: '1.0.0',
+    endpoints: {
+      users: '/users',
+      habits: '/habits',
+      login: '/users/login',
+      register: '/users/register'
+    }
+  });
+});
+
+// Root route for health check
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Habits Tracker Backend API',
+    status: 'running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -39,7 +62,25 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.json({ error: err });
+  
+  // For API routes, return JSON
+  if (req.path.startsWith('/api/') || req.path.startsWith('/users') || req.path.startsWith('/habits')) {
+    res.json({ 
+      error: err.message || 'Internal Server Error',
+      status: err.status || 500
+    });
+  } else {
+    // For other routes, try to render error page
+    try {
+      res.render('error');
+    } catch (renderError) {
+      // If rendering fails, return JSON
+      res.json({ 
+        error: err.message || 'Internal Server Error',
+        status: err.status || 500
+      });
+    }
+  }
 });
 
 module.exports = app;
