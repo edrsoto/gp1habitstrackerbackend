@@ -23,14 +23,15 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-// Add CORS headers FIRST - before any other middleware
+// Complete CORS bypass - allow everything
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Allow-Credentials', 'false');
   
   if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Max-Age', '86400');
     res.sendStatus(200);
     return;
   }
@@ -38,16 +39,10 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-  origin: [
-    'https://gp1habitstracker-frontend-e8xdaq1sr-ess-projects-ecec6cc8.vercel.app',
-    'https://gp1habitstracker-frontend.vercel.app',
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'http://localhost:3001'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: '*',
+  credentials: false,
+  methods: '*',
+  allowedHeaders: '*'
 }));
 
 app.use(logger('dev'));
