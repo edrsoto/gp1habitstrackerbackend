@@ -12,19 +12,31 @@ router.get('/', function(req, res, next) {
 /* POST users listing. */
 router.post('/register', async function(req, res, next) {
   try {
+    console.log('🔐 Register attempt received:', req.body);
     const { username, password } = req.body;
     
+    console.log('🧂 Generating salt...');
     const salt = bcrypt.genSaltSync(10);
+    console.log('🧂 Salt generated:', salt);
+    
+    console.log('🔐 Hashing password...');
     const hashedPassword = bcrypt.hashSync(password, salt);
+    console.log('🔐 Password hashed successfully');
 
+    console.log('👤 Creating user object...');
     const newUser = new User({
       username,
       password: hashedPassword
     });
+    console.log('👤 User object created:', newUser);
+    
+    console.log('💾 Saving user to database...');
     await newUser.save();
+    console.log('✅ User saved successfully:', newUser.username);
+    
     res.status(201).json({ message: 'Usuario registrado correctamente' });
   } catch (error) {
-    console.error(error);
+    console.error('❌ Registration error:', error);
     res.status(500).json({ message: 'Error en el registro', 'description': error.toString() });
   }
 });
