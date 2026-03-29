@@ -38,7 +38,13 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-  origin: true, // Allow all origins
+  origin: [
+    'https://gp1habitstracker-frontend-e8xdaq1sr-ess-projects-ecec6cc8.vercel.app',
+    'https://gp1habitstracker-frontend.vercel.app',
+    'http://localhost:3000',
+    'https://localhost:3000',
+    'http://localhost:3001'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
