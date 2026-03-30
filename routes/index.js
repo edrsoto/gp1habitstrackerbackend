@@ -192,6 +192,42 @@ router.post('/habits', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /habits/{id}:
+ *   delete:
+ *     summary: Delete a habit
+ *     tags: [Habits]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the habit to delete
+ *         schema:
+ *           type: string
+ *           example: "60f7b3b3b3b3b3b3b3b3b3"
+ *     responses:
+ *       200:
+ *         description: Habit deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Habit'
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.delete('/habits/:id', authenticateToken, async (req, res) => {
   try {
   const { id } = req.params;
@@ -202,6 +238,46 @@ router.delete('/habits/:id', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /habits/marksadone/{id}:
+ *   patch:
+ *     summary: Mark a habit as done
+ *     tags: [Habits]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the habit to mark as done
+ *         schema:
+ *           type: string
+ *           example: "60f7b3b3b3b3b3b3b3b3b3"
+ *     responses:
+ *       200:
+ *         description: Habit marked as done successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Habit marked as done"
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.patch('/habits/marksadone/:id', authenticateToken, async (req, res) => {
   try {
     const habit = await Habit.findById(req.params.id);
