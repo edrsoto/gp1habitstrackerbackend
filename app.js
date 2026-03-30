@@ -75,7 +75,15 @@ app.use('/api-docs', (req, res, next) => {
 }, swaggerUi.serve, swaggerUi.setup(specs, {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Habits Tracker API Documentation'
+  customSiteTitle: 'Habits Tracker API Documentation',
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true,
+    showExtensions: true,
+    showCommonExtensions: true,
+    docExpansion: 'none'
+  }
 }));
 
 // API root route
