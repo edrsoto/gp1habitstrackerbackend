@@ -19,8 +19,12 @@ const options = {
         description: 'Production server'
       },
       {
-        url: 'https://localhost:3001',
+        url: 'http://localhost:3001',
         description: 'Development server'
+      },
+      {
+        url: 'http://localhost:3000',
+        description: 'Frontend development server'
       }
     ],
     components: {
