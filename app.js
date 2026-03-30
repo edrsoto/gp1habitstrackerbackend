@@ -18,6 +18,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 
+const { specs, swaggerUi } = require('./config/swagger');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -54,16 +56,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Habits Tracker API Documentation'
+}));
+
 // API root route
 app.get('/api', (req, res) => {
   res.json({ 
     message: 'Habits Tracker API',
     version: '1.0.0',
+    documentation: '/api-docs',
     endpoints: {
       users: '/users',
       habits: '/habits',
       login: '/users/login',
-      register: '/users/register'
+      register: '/users/register',
+      swagger: '/api-docs'
     }
   });
 });

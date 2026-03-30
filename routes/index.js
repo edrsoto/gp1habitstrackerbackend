@@ -1,3 +1,50 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Habit:
+ *       type: object
+ *       required:
+ *         - title
+ *         - description
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated id of the habit
+ *           example: "60f7b3b3b3b3b3b3b3b3b3"
+ *         title:
+ *           type: string
+ *           description: The title of the habit
+ *           example: "Exercise daily"
+ *         description:
+ *           type: string
+ *           description: The description of the habit
+ *           example: "Exercise for 30 minutes every day"
+ *         userId:
+ *           type: string
+ *           description: The id of the user who owns this habit
+ *           example: "60f7b3b3b3b3b3b3b3b3"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The date when the habit was created
+ *           example: "2023-07-20T10:30:00.000Z"
+ *     HabitInput:
+ *       type: object
+ *       required:
+ *         - title
+ *         - description
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: The title of the habit
+ *           example: "Exercise daily"
+ *         description:
+ *           type: string
+ *           description: The description of the habit
+ *           example: "Exercise for 30 minutes every day"
+ */
+
 var express = require('express');
 var router = express.Router();
 const Habit = require('../models/Habit');
@@ -27,10 +74,58 @@ const authenticateToken = (req, res, next) => {
 };
 
 /* GET home page. */
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Get home page
+ *     tags: [Home]
+ *     responses:
+ *       200:
+ *         description: Home page response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   example: "Express"
+ */
 router.get('/', function(req, res, next) {
   res.json({ title: 'Express' });
 });
 
+/**
+ * @swagger
+ * /habits:
+ *   get:
+ *     summary: Get all habits for authenticated user
+ *     tags: [Habits]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of habits
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Habit'
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.get('/habits', authenticateToken, async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
@@ -46,6 +141,40 @@ router.get('/habits', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /habits:
+ *   post:
+ *     summary: Create a new habit
+ *     tags: [Habits]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/HabitInput'
+ *     responses:
+ *       200:
+ *         description: Habit created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Habit'
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/habits', authenticateToken, async (req, res) => {
   try {
     if (!req.user || !req.user.id) {

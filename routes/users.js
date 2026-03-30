@@ -1,14 +1,93 @@
-var express = require('express');
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - username
+ *         - password
+ *       properties:
+ *         username:
+ *           type: string
+ *           description: The username of the user
+ *           example: "john_doe"
+ *         password:
+ *           type: string
+ *           description: The password of the user
+ *           example: "password123"
+ *     LoginResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "Inicio de sesión exitoso"
+ *         token:
+ *           type: string
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "Usuario no encontrado"
+ */
+
+const express = require('express');
 var router = express.Router();
 const bcrypt = require('bcryptjs');
-const User = require('../models/Users');
 const jwt = require('jsonwebtoken');
+const User = require('../models/Users');
 
 /* GET users listing. */
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get users endpoint
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Users endpoint response
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Usuario registrado correctamente"
+ *       500:
+ *         description: Registration error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 /* POST users listing. */
 router.post('/register', async function(req, res, next) {
   try {
@@ -41,6 +120,38 @@ router.post('/register', async function(req, res, next) {
   }
 });
 
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginResponse'
+ *       400:
+ *         description: Login error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/login', async function(req, res, next) {
   try {
     console.log('🔐 Login attempt received:', req.body);
