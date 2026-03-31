@@ -25,29 +25,20 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-// Complete CORS bypass - allow everything
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'false');
-  
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Max-Age', '86400');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.sendStatus(200);
-    return;
-  }
-  next();
-});
+// Simple CORS configuration for local and Vercel frontend
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://habits-tracker-frontend-coral.vercel.app'
+];
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+  })
+);
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -150,13 +141,9 @@ app.use(function(err, req, res, next) {
   } else {
     // For other routes, try to render error page
     try {
-      res.render('error');
-    } catch (renderError) {
-      // If rendering fails, return JSON
-      res.json({ 
-        error: err.message || 'Internal Server Error',
-        status: err.status || 500
-      });
+      res.json({ error: 'Internal Server Error' });
+    } catch (error) {
+      res.json({ error: 'Internal Server Error' });
     }
   }
 });
