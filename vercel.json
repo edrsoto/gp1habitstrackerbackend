@@ -2,18 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "./app.js",
+      "src": "app.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/app.js"
+      "dest": "app.js"
     }
   ],
   "env": {
-    "NODE_ENV": "production",
+    "NODE_ENV": "development",
     "MONGODB_URI": "mongodb+srv://06182151_db_user:ojkh9l0peQYGORue@cluster0.kqf1sp9.mongodb.net/habitsApp?appName=Cluster0",
     "JWT_SECRET": "ProgramaciónAvanzada",
     "PORT": "3001"
