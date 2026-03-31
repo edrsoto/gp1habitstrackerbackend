@@ -62,9 +62,7 @@ const authenticateToken = (req, res, next) => {
   }
   try {
     const tokenWithoutBearer = token.replace('Bearer ', '');
-    console.log('Token sin Bearer:', tokenWithoutBearer);
     const verified = jwt.verify(tokenWithoutBearer, process.env.JWT_SECRET);
-    console.log('Token verificado:', verified);
     req.user = verified;
     next();
   } catch (error) {
@@ -128,16 +126,15 @@ router.get('/', function(req, res, next) {
  */
 router.get('/habits', authenticateToken, async (req, res) => {
   try {
-    if (!req.user || !req.user.id) {
-      return res.status(500).json({ message: "Error retrieving habits: user not found" });
-    }
-    const userId = req.user.id;
-    const habits = await Habit.find({ 'userId': new mongoose.Types.ObjectId(userId) });
-    console.log('Habits encontrados para usuario', userId, ':', habits);
-    res.json(habits);
+      const userId = req.user?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      const habits = await Habit.find({ userId: new mongoose.Types.ObjectId(userId) });
+      res.json(habits);
   } catch (err) {
-    console.error('Error en GET /habits:', err);
-    res.status(500).json({ message: 'Error retrieving habits' });
+      res.status(500).json({ message: 'Error retrieving habits' });
   }
 });
 
@@ -177,17 +174,16 @@ router.get('/habits', authenticateToken, async (req, res) => {
  */
 router.post('/habits', authenticateToken, async (req, res) => {
   try {
-    if (!req.user || !req.user.id) {
-      return res.status(500).json({ message: "Error adding habits: user not found" });
-    }
     const { title, description } = req.body;
-    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
     const habit = new Habit({ title, description, userId });
     await habit.save();
-    console.log('Habit creado:', habit);
     res.json(habit);
   } catch (err) {
-    console.error('Error en POST /habits:', err);
     res.status(400).json({ message: 'Error creating habit' });
   }
 });
@@ -230,11 +226,10 @@ router.post('/habits', authenticateToken, async (req, res) => {
  */
 router.delete('/habits/:id', authenticateToken, async (req, res) => {
   try {
-  const { id } = req.params;
-    const habit = await Habit.findByIdAndDelete(id);
-    res.json(habit);
+    await Habit.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Habit deleted' });
   } catch (err) {
-    res.status(500).json({ message: 'Error deleting habit' });
+    res.status(500).json({ message: 'Habit not found' });
   }
 });
 
@@ -278,60 +273,29 @@ router.delete('/habits/:id', authenticateToken, async (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch('/habits/marksadone/:id', authenticateToken, async (req, res) => {
-  try {
-    console.log('🎯 Mark as done attempt for habit:', req.params.id);
-    
-    const habit = await Habit.findById(req.params.id);
-    if (!habit) {
-      console.log('❌ Habit not found:', req.params.id);
-      return res.status(404).json({ message: 'Habit not found' });
-    }
-    
-    console.log('📅 Current habit state:', {
-      lastDone: habit.lastDone,
-      lastUpdated: habit.lastUpdated,
-      days: habit.days,
-      createdAt: habit.createdAt
-    });
-    
-    const now = new Date();
-    habit.lastDone = now;
-    
-    // Check if this is the first time marking as done
-    if (!habit.lastUpdated || habit.lastUpdated === habit.createdAt) {
-      console.log('🆕 First time marking as done');
-      habit.days = 1;
-      habit.lastUpdated = now;
+const markHabitAsDoneHandler = async (req, res) => {
+  try {    
+    const habit = await Habit.findById(req.params.id); 
+    habit.lastDone = new Date();
+    if (timeDifferenceInHours(habit.lastDone, new Date()) < 24) {
+      habit.days = timeDifferenceInDays(habit.lastDone, habit.startedAt);
+      habit.lastUpdate = new Date();
+      habit.save();
+      res.status(200).json({ message: 'Habit marked as done' });
     } else {
-      // Check if it's been less than 24 hours since last update
-      const hoursSinceLastUpdate = timeDifferenceInHours(now, habit.lastUpdated);
-      console.log('⏰ Hours since last update:', hoursSinceLastUpdate);
-      
-      if (hoursSinceLastUpdate < 24) {
-        // Continue streak
-        habit.days = timeDifferenceInDays(now, habit.createdAt) + 1;
-        console.log('🔥 Continuing streak, days:', habit.days);
-      } else {
-        // Reset streak
-        habit.days = 1;
-        console.log('🔄 Resetting streak to 1');
-      }
-      habit.lastUpdated = now;
+      habit.days = 1;
+      habit.lastUpdate = new Date();
+      habit.save();
+      res.status(200).json({ message: 'Habit restarted' });
     }
-    
-    await habit.save();
-    console.log('✅ Habit updated successfully:', habit);
-    
-    res.status(200).json({ 
-      message: 'Habit marked as done',
-      habit: habit
-    });
-  } catch (err) {
-    console.error('❌ Error marking habit as done:', err);
-    res.status(500).json({ message: 'Error marking habit as done', error: err.message });
-  }
-});
+
+    } catch (err) {
+      res.status(500).json({ message: 'Habit not found' });
+    }
+  };
+
+router.patch('/habits/marksadone/:id', authenticateToken, markHabitAsDoneHandler);
+router.patch('/habits/markAsDone/:id', authenticateToken, markHabitAsDoneHandler);
 
 const timeDifferenceInHours = (date1, date2) => {
     const differenceMs = Math.abs(date1 - date2);

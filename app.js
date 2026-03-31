@@ -43,8 +43,8 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-  origin: '*',
-  credentials: false,
+  origin: 'http://localhost:3000',
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 }));
