@@ -15,7 +15,7 @@ const options = {
     },
     servers: [
       {
-        url: 'https://gp1habitstrackerbackend-htyl9geu5-ess-projects-ecec6cc8.vercel.app',
+        url: 'https://gp1habitstrackerbackend.vercel.app',
         description: 'Production server'
       },
       {

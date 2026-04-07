@@ -25,20 +25,27 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-// Simple CORS configuration for local and Vercel frontend
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://habits-tracker-frontend-coral.vercel.app'
-];
+// CORS for local frontend and Vercel frontends
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
-  })
-);
+    const isLocalhost = origin === 'http://localhost:3000';
+    const isVercelFrontend = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin);
+
+    if (isLocalhost || isVercelFrontend) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(logger('dev'));
 app.use(express.json());
